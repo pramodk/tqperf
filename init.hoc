@@ -21,7 +21,7 @@ printf("pattern %d\n", pattern_time.size)
 }
 pnm = new ParallelNetManager(ncell)
 pc = pnm.pc
-{pc.timeout(1)}
+{pc.timeout(100)}
 fake_nhost = 0
 fake_id = 0
 if (fake_nhost) {
@@ -113,6 +113,7 @@ proc beforerun() {
 }
 
 proc methodrun() {local tt, n, nmax
+	if (pnm.myid == 0) {print "===============START OF RUN============"}
 	tt = startsw()
 	beforerun()
 	bgpdma = $1
@@ -126,21 +127,22 @@ proc methodrun() {local tt, n, nmax
 
 	prun()
 	afterrun(tt)
+	if (pnm.myid == 0) {print "===============END OF RUN============"}
 }
 
 proc afterrun() {local tt, n, nmax
 	if (pnm.myid == 0) {print "RunTime: ", runtime}
 
 	print_total_spikes()
-	if (spkfile == 1) {
-		spike2file()
-	}
+	//if (spkfile == 1) {
+	//	spike2file()
+	//}
 	if (bgpdma > 0) {
 		n = pnm.pc.send_time(12)
 		nmax = pnm.pc.allreduce(n, 2)
 		if (pnm.myid == 0) {
-			printf("max multisend ranks on rank 0 is %d\n", n)
-			printf("max multisend ranks on all ranks is %d\n", nmax)
+			printf("    max multisend ranks on rank 0 is %d\n", n)
+			printf("    max multisend ranks on all ranks is %d\n", nmax)
 		}
 	}
 	methodrun_time = startsw() - $1
@@ -148,9 +150,9 @@ proc afterrun() {local tt, n, nmax
 	p_tperf()
 	if (pnm.myid == 0) {
 		print "method info ", pnm.pc.send_time(8)
-		print "methodrun time: ", methodrun_time
-		printf("elapsed_time = %g\n", elapsed_time)
-		printf("real elapsed = %g\n", startsw() - begintime)
+		print "  ==> TOTAL TIME = ", methodrun_time
+		//printf("elapsed_time = %g\n", elapsed_time)
+		//printf("real elapsed = %g\n", startsw() - begintime)
 	}
 }
 

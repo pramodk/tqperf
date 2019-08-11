@@ -17,11 +17,19 @@ default_var("coredat", "coredat")
 
 if (1) {
 	seq = 0
-	spkfile = 1
-	ncellpow = 12
+	spkfile = 0
+	ncellpow = 20
 	ncon = 1000
 	mkmodel(ncellpow, ncon)
-	{use2phase = 0 doseries(1)}
+	{use2interval = 0 doseries(1)}
+	{use2interval = 1 doseries(1)}
+    // just dummy run for warmup of alltoallv
+	{use2interval = 0 use2phase = 0 doseries(2)}
+    // done dummy run
+	{use2interval = 0 use2phase = 0 doseries(2)}
+	{use2interval = 1 use2phase = 0 doseries(2)}
+	{use2interval = 0 use2phase = 1 doseries(2)}
+	{use2interval = 1 use2phase = 1 doseries(2)}
 }
 
-finish()
+//finish()
